@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NEXUS - Desarrollo de Software & IA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;scroll-behavior:smooth}
+:root{--oro:#FFD700;--exito:#2ECC71;--error:#E74C3C;--racha:#FFA500;--morado:#9B59B6;--boss:#FF4444;--bg:#0B0D17;--card:#151830CC;--texto:#ECF0F1;--muted:#99A1B3;--accent:#6C63FF;--cyan:#00FFFF}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0B0D17}
+::-webkit-scrollbar-thumb{background:var(--oro);border-radius:3px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--texto);overflow-x:hidden}
+a{color:var(--oro);text-decoration:none}
+
+/* STARS */
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--dur) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:.1;transform:scale(.5)}100%{opacity:.8;transform:scale(1)}}
+
+/* SHOOTING STAR */
+.shooting-star{position:fixed;width:2px;height:2px;background:#fff;border-radius:50%;z-index:1;pointer-events:none;animation:shoot linear infinite}
+.shooting-star::after{content:'';position:absolute;top:50%;transform:translateY(-50%);width:80px;height:1px;background:linear-gradient(to right,rgba(255,255,255,.6),transparent);left:2px}
+@keyframes shoot{0%{transform:translate(0,0);opacity:0}5%{opacity:1}20%{opacity:1}35%{opacity:0}100%{transform:translate(600px,400px);opacity:0}}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(11,13,23,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,215,0,.1);padding:0 20px}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:56px}
+.logo{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:900;letter-spacing:2px;color:var(--oro)}
+.logo span{color:var(--cyan);font-weight:300}
+.nav-links{display:flex;gap:24px;list-style:none}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--oro);transition:width .3s}
+.nav-links a:hover{color:var(--oro)}
+.nav-links a:hover::after{width:100%}
+.menu-btn{display:none;background:none;border:none;color:var(--texto);font-size:24px;cursor:pointer}
+
+/* SECTIONS */
+section{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:100px 20px}
+.section-title{font-size:32px;font-weight:800;margin-bottom:8px;text-align:center;background:linear-gradient(135deg,var(--oro),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.section-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:50px}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding-top:56px;text-align:center;position:relative}
+.hero-content{max-width:750px;padding:20px}
+.hero-badge{display:inline-block;padding:6px 18px;border:1px solid var(--oro);border-radius:20px;font-size:12px;color:var(--oro);margin-bottom:20px;letter-spacing:1px}
+.hero-title{font-size:clamp(40px,8vw,80px);font-weight:900;line-height:1.1;margin-bottom:16px}
+.hero-title .nexus{color:var(--oro)}
+.hero-title .highlight{background:linear-gradient(135deg,var(--cyan),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:18px;color:var(--muted);max-width:600px;margin:0 auto 30px;line-height:1.6}
+.hero-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .3s;border:none;text-decoration:none}
+.btn-primary{background:var(--oro);color:#0B0D17}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(255,215,0,.3)}
+.btn-outline{background:transparent;border:1.5px solid var(--muted);color:var(--texto)}
+.btn-outline:hover{border-color:var(--oro);color:var(--oro);transform:translateY(-3px)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(108,99,255,.3)}
+.hero-stats{margin-top:50px;display:flex;gap:40px;justify-content:center;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat-num{font-size:36px;font-weight:900;color:var(--oro)}
+.hero-stat-label{font-size:12px;color:var(--muted);margin-top:4px}
+.scroll-indicator{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);animation:bounce 2s infinite;color:var(--muted);font-size:24px;cursor:pointer}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+
+/* ABOUT */
+.about-content{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.about-text h3{font-size:22px;margin-bottom:14px;color:var(--oro)}
+.about-text p{color:var(--muted);line-height:1.7;margin-bottom:14px;font-size:15px}
+.about-tech{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tech-badge{padding:6px 14px;background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.3);border-radius:6px;font-size:12px;color:var(--accent)}
+.about-quote{background:rgba(255,215,0,.06);border-left:3px solid var(--oro);padding:20px 24px;border-radius:0 10px 10px 0;margin-top:16px;font-style:italic}
+.about-quote p{color:var(--muted);font-size:14px;margin:0}
+
+/* PROJECTS */
+.projects-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.project-card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.05);transition:all .4s}
+.project-card:hover{transform:translateY(-6px);border-color:rgba(255,215,0,.2);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.project-card.full{grid-column:1/-1}
+.project-header{padding:18px 20px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.project-info{flex:1}
+.project-name{font-size:18px;font-weight:800;color:var(--oro)}
+.project-tech{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.project-tech span{padding:3px 8px;background:rgba(255,255,255,.06);border-radius:4px;font-size:10px;color:var(--muted)}
+.project-desc{padding:10px 20px;color:var(--muted);font-size:13px;line-height:1.6}
+.project-links{padding:0 20px 14px;display:flex;gap:10px}
+.project-links a{font-size:12px;color:var(--cyan);font-weight:600}
+.project-links a:hover{color:var(--oro)}
+.project-demo{padding:0 0 18px}
+
+/* DEMO: QUIZ */
+.demo-quiz{padding:16px 20px;background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.05)}
+.quiz-question{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--texto)}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quiz-opt{padding:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;cursor:pointer;font-size:13px;text-align:center;transition:all .3s;color:var(--texto)}
+.quiz-opt:hover{background:var(--accent);border-color:var(--accent)}
+.quiz-opt.correct{background:#2ECC7144;border-color:var(--exito)}
+.quiz-opt.wrong{background:#E74C3C44;border-color:var(--error)}
+.quiz-opt.selected{transform:scale(.95)}
+.quiz-result{text-align:center;padding:14px;font-weight:700;border-radius:8px;margin-top:10px}
+.quiz-result.correct{background:#2ECC7122;color:var(--exito)}
+.quiz-result.wrong{background:#E74C3C22;color:var(--error)}
+.quiz-next{display:block;width:100%;padding:10px;margin-top:10px;background:var(--oro);color:#0B0D17;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+
+/* DEMO: TERMINAL */
+.demo-terminal{padding:0 20px 18px}
+.terminal{background:#0a0a0a;border-radius:10px;overflow:hidden;border:1px solid #333}
+.terminal-bar{background:#1a1a2e;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.terminal-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.terminal-dot.r{background:#ff5f57}
+.terminal-dot.y{background:#ffbd2e}
+.terminal-dot.g{background:#28c840}
+.terminal-body{padding:12px;font-family:'Courier New',monospace;font-size:13px;line-height:1.5;min-height:180px;max-height:250px;overflow-y:auto;color:#ccc}
+.terminal-body .prompt{color:var(--exito)}
+.terminal-body .cmd{color:var(--oro)}
+.terminal-body .output{color:#aaa;white-space:pre-wrap}
+.terminal-body .info{color:var(--cyan)}
+.terminal-input-row{display:flex;background:#0a0a0a;border-top:1px solid #222;padding:0}
+.terminal-input-row .prompt{color:var(--exito);padding:10px 0 10px 12px;font-family:'Courier New',monospace;font-size:13px}
+.terminal-input{flex:1;background:transparent;border:none;color:var(--oro);font-family:'Courier New',monospace;font-size:13px;padding:10px 8px;outline:none}
+.terminal-input::placeholder{color:#444}
+
+/* DEMO: CODE LESSON */
+.demo-code{padding:16px 20px;background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.05)}
+.code-editor{background:#1a1a2e;border-radius:8px;overflow:hidden}
+.code-header{padding:8px 12px;background:#0a0a1a;font-size:11px;color:var(--muted)}
+.code-body{font-family:'Courier New',monospace;font-size:13px;line-height:1.6;overflow-x:auto}
+.code-body pre{margin:0;padding:12px}
+.code-body code{color:#ccc}
+.code-body .kw{color:var(--accent)}
+.code-body .str{color:var(--exito)}
+.code-body .cm{color:#666}
+.code-body .fn{color:var(--cyan)}
+.code-body .num{color:var(--racha)}
+.code-run{padding:10px;display:flex;gap:8px;align-items:center;background:#0a0a1a}
+.code-run-btn{padding:6px 16px;background:var(--exito);color:#0B0D17;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px}
+.code-output{margin:10px 0 0;padding:12px;background:#111;border-radius:6px;font-family:'Courier New',monospace;font-size:12px;color:var(--exito);min-height:20px;border:1px solid #222}
+
+/* SERVICES */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.service-card{background:var(--card);border-radius:14px;padding:24px;border:1px solid rgba(255,255,255,.05);transition:all .4s;text-align:center}
+.service-card:hover{transform:translateY(-4px);border-color:rgba(255,215,0,.2)}
+.service-icon{font-size:36px;margin-bottom:14px;display:block}
+.service-card h3{font-size:17px;font-weight:700;margin-bottom:8px;color:var(--oro)}
+.service-card p{color:var(--muted);font-size:13px;line-height:1.6}
+.service-card .price{display:inline-block;margin-top:12px;padding:4px 12px;background:rgba(255,215,0,.1);border-radius:6px;font-size:12px;color:var(--oro);font-weight:600}
+
+/* GITHUB */
+.github-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.github-card{background:var(--card);border-radius:10px;padding:16px;border:1px solid rgba(255,255,255,.05);transition:all .3s}
+.github-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.github-card h4{font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:4px}
+.github-card p{font-size:12px;color:var(--muted);margin-bottom:6px}
+.github-card .meta{display:flex;gap:12px;font-size:11px;color:var(--muted)}
+.github-card .meta span{display:flex;align-items:center;gap:3px}
+
+/* CONTACT */
+.contact-content{max-width:600px;margin:0 auto}
+.contact-form{background:var(--card);border-radius:14px;padding:30px;border:1px solid rgba(255,255,255,.05)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:500}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--texto);font-size:14px;font-family:inherit;transition:border .3s;outline:none}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--oro)}
+.form-group textarea{min-height:100px;resize:vertical}
+.contact-extra{text-align:center;margin-top:20px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.contact-extra a{display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--card);border-radius:10px;font-size:13px;transition:all .3s;border:1px solid rgba(255,255,255,.05)}
+.contact-extra a:hover{border-color:var(--oro);color:var(--oro)}
+
+/* FOOTER */
+footer{position:relative;z-index:2;text-align:center;padding:40px 20px;border-top:1px solid rgba(255,255,255,.05)}
+footer p{color:var(--muted);font-size:12px}
+footer .social{display:flex;gap:14px;justify-content:center;margin-bottom:14px}
+footer .social a{color:var(--muted);font-size:18px;transition:color .3s}
+footer .social a:hover{color:var(--oro)}
+
+/* ANIMATIONS */
+.fade-in{opacity:0;transform:translateY(30px);transition:all .6s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.typing{overflow:hidden;border-right:2px solid var(--oro);white-space:nowrap;animation:typing 2s steps(20) forwards,blink-caret .7s step-end infinite;width:0;display:inline-block}
+@keyframes typing{from{width:0}to{width:100%}}
+@keyframes blink-caret{50%{border-color:transparent}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:56px;left:0;width:100%;background:rgba(11,13,23,.98);flex-direction:column;padding:20px;gap:16px;border-bottom:1px solid rgba(255,215,0,.1)}
+  .nav-links.open{display:flex}
+  .menu-btn{display:block}
+  .about-content{grid-template-columns:1fr}
+  .projects-grid{grid-template-columns:1fr}
+  .github-grid{grid-template-columns:1fr}
+  .quiz-options{grid-template-columns:1fr}
+  .hero-stats{gap:20px}
+  section{padding:60px 16px}
+}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div id="shooting-stars"></div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">NEXUS <span>//</span> DEV</a>
+    <button class="menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <ul class="nav-links">
+      <li><a href="#about">Sobre mí</a></li>
+      <li><a href="#projects">Proyectos</a></li>
+      <li><a href="#services">Servicios</a></li>
+      <li><a href="#github">GitHub</a></li>
+      <li><a href="#contact">Contacto</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">✦ DESARROLLADOR FULL-STACK + IA ✦</div>
+    <h1 class="hero-title">
+      <span class="nexus">NEXUS</span><br>
+      <span class="highlight">Código que transforma ideas</span>
+    </h1>
+    <p class="hero-desc">
+      Apps de escritorio, asistentes con inteligencia artificial, automatización y páginas web.
+      Convierto tus ideas en software real.
+    </p>
+    <div class="hero-buttons">
+      <a href="#projects" class="btn btn-primary">🚀 Ver proyectos</a>
+      <a href="#contact" class="btn btn-outline">📩 Contratarme</a>
+      <a href="#services" class="btn btn-accent">⚡ Servicios</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num" id="stat-projects">8+</div>
+        <div class="hero-stat-label">Proyectos realizados</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">Python</div>
+        <div class="hero-stat-label">Stack principal</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">IA</div>
+        <div class="hero-stat-label">Asistentes inteligentes</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator" onclick="document.getElementById('about').scrollIntoView()">⌄</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <h2 class="section-title">Sobre mí</h2>
+  <p class="section-sub">Detrás de NEXUS</p>
+  <div class="about-content">
+    <div class="about-text fade-in">
+      <h3>Sebastian Alfonzo</h3>
+      <p>
+        Soy desarrollador de software, creador de <strong>NEXUS</strong> — una marca que nace de mi pasión por 
+        construir herramientas que realmente funcionan. He desarrollado desde apps educativas interactivas 
+        con gamificación hasta asistentes de IA 100% locales que controlan el PC por voz.
+      </p>
+      <p>
+        Mi enfoque es simple: <strong>código limpio, experiencias pulidas, y productos que la gente 
+        quiera usar</strong>. Cada proyecto que hago tiene animaciones, sonido, y atención al detalle.
+      </p>
+      <div class="about-quote">
+        <p>"No solo programo. Creo experiencias completas: apps de escritorio, inteligencia artificial, 
+        automatización, y enseñanza. Todo con Python y pasión."</p>
+      </div>
+      <div class="about-tech">
+        <span class="tech-badge">Python</span>
+        <span class="tech-badge">Flet</span>
+        <span class="tech-badge">Ollama/LLMs</span>
+        <span class="tech-badge">Firebase</span>
+        <span class="tech-badge">HTML/CSS/JS</span>
+        <span class="tech-badge">Git/GitHub</span>
+      </div>
+    </div>
+    <div class="about-text fade-in" style="background:var(--card);border-radius:14px;padding:24px;border:1px solid rgba(255,255,255,.05)">
+      <h3 style="font-size:16px;color:var(--cyan)">✦ Lo que puedo hacer por ti</h3>
+      <ul style="list-style:none;margin-top:12px">
+        <li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px">
+          <span style="color:var(--oro)">▸</span> Apps de escritorio con Python + Flet
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px">
+          <span style="color:var(--cyan)">▸</span> Asistentes IA locales con Ollama
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px">
+          <span style="color:var(--exito)">▸</span> Automatización y scripts Python
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px">
+          <span style="color:var(--racha)">▸</span> Páginas web y landing pages
+        </li>
+        <li style="padding:8px 0;display:flex;gap:10px">
+          <span style="color:var(--morado)">▸</span> Clases de programación Python
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <h2 class="section-title">Proyectos</h2>
+  <p class="section-sub">Interactúa con demos reales de lo que he construido</p>
+  <div class="projects-grid">
+
+    <!-- ASTROBOOK -->
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <div class="project-info">
+          <div class="project-name">🌌 Astrobook</div>
+          <div class="project-tech">
+            <span>Python</span><span>Flet</span><span>Firebase</span><span>IA Quiz</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-desc">
+        Plataforma educativa interactiva de astronomía con 35 niveles, jefes finales, sistema de XP,
+        rachas, misiones diarias, speedrun y 5 temas visuales. Conectada a Firebase para guardar progreso.
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/sebastian-2308/appastronomia" target="_blank">🔗 GitHub</a>
+      </div>
+      <div class="project-demo demo-quiz" id="quiz-demo">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">✦ DEMO: Mini quiz astronómico</div>
+        <div class="quiz-question" id="quiz-q">Cargando...</div>
+        <div class="quiz-options" id="quiz-opts"></div>
+        <div class="quiz-result" id="quiz-result" style="display:none"></div>
+        <button class="quiz-next" id="quiz-next" style="display:none">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- NEXUS -->
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <div class="project-info">
+          <div class="project-name">⚡ Nexus (CLI)</div>
+          <div class="project-tech">
+            <span>Python</span><span>Ollama</span><span>LLM</span><span>Click</span><span>Rich</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-desc">
+        Asistente de programación con IA. Analiza código, edita archivos, ejecuta comandos y 
+        construye proyectos complejos. Conectable a Ollama, OpenAI o Anthropic. Tiene sistema 
+        de herramientas, sesiones y modo plan multi-paso.
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/sebastian-2308?tab=repositories" target="_blank">🔗 GitHub</a>
+      </div>
+      <div class="project-demo demo-terminal" id="nexus-terminal">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span><span class="terminal-dot r"></span><span class="terminal-dot y"></span><span class="terminal-dot g"></span></span>
+            <span style="margin-left:8px">nexus@sebastian:~</span>
+          </div>
+          <div class="terminal-body" id="terminal-body">
+            <div><span class="prompt">➜</span> <span class="cmd">nexus --version</span></div>
+            <div><span class="output">nexus v2.0.0</span></div>
+            <div><span class="prompt">➜</span> <span class="cmd">nexus --provider ollama --model qwen2.5-coder:7b</span></div>
+            <div class="info">╭────────────────────────────────────╮</div>
+            <div class="info">│ 🔧 Provider: ollama                │</div>
+            <div class="info">│ 🤖 Model:    qwen2.5-coder:7b      │</div>
+            <div class="info">│ 📁 WorkDir:  /proyecto             │</div>
+            <div class="info">│ ⚡ Tools: read, write, edit, bash  │</div>
+            <div class="info">╰────────────────────────────────────╯</div>
+          </div>
+          <div class="terminal-input-row">
+            <span class="prompt">➜</span>
+            <input class="terminal-input" id="terminal-input" placeholder="Escribe un comando..." autofocus>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REBECA -->
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <div class="project-info">
+          <div class="project-name">🤖 Rebeca</div>
+          <div class="project-tech">
+            <span>Python</span><span>LLM</span><span>Ollama</span><span>Tool-use</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-desc">
+        Agente conversacional con capacidad de usar herramientas. Rebeca entiende órdenes en lenguaje 
+        natural y ejecuta herramientas como leer archivos, buscar código, analizar proyectos, 
+        ejecutar comandos y más. Arquitectura modular con sistema de plugins.
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/sebastian-2308/rebeca" target="_blank">🔗 GitHub</a>
+      </div>
+    </div>
+
+    <!-- IA LOCAL -->
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <div class="project-info">
+          <div class="project-name">🖥️ JARVIS IA Local</div>
+          <div class="project-tech">
+            <span>Python</span><span>Ollama</span><span>Voz</span><span>Selenium</span><span>Portable</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-desc">
+        Asistente de escritorio con inteligencia artificial 100% local, sin internet, sin instalación. 
+        Controla tu PC por voz o texto como JARVIS. Abre programas, busca en web, controla volumen, 
+        mouse y teclado. ¡Portable en USB!
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/sebastian-2308/IA-LOCAL-Agente-Aut-nomo-Portable-V.1" target="_blank">🔗 GitHub</a>
+      </div>
+    </div>
+
+    <!-- CLASES PYTHON -->
+    <div class="project-card fade-in full">
+      <div class="project-header">
+        <div class="project-info">
+          <div class="project-name">📚 Códigos Educativos</div>
+          <div class="project-tech">
+            <span>Python</span><span>Enseñanza</span><span>Variables</span><span>Bucles</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-desc">
+        Lecciones interactivas de Python desde cero, usando ejemplos reales de Astrobook. 
+        Aprende variables, tipos, condicionales, listas, diccionarios y bucles mientras 
+        ves cómo se aplican en un proyecto real.
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/sebastian-2308?tab=repositories" target="_blank">🔗 GitHub</a>
+      </div>
+      <div class="project-demo demo-code">
+        <div class="code-editor">
+          <div class="code-header">📄 leccion_variables.py</div>
+          <div class="code-body">
+<pre><code><span class="cm"># Escribe tu código y ejecútalo 👇</span>
+<span class="kw">def</span> <span class="fn">calcular_rango</span>(xp):
+    <span class="kw">if</span> xp &lt;= <span class="num">199</span>:
+        <span class="kw">return</span> <span class="str">"🌑 Novato"</span>
+    <span class="kw">elif</span> xp &lt;= <span class="num">499</span>:
+        <span class="kw">return</span> <span class="str">"🌙 Astrónomo"</span>
+    <span class="kw">elif</span> xp &lt;= <span class="num">999</span>:
+        <span class="kw">return</span> <span class="str">"🚀 Explorador"</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="str">"👑 Leyenda Cósmica"</span>
+
+<span class="cm"># ¡Prueba con tu XP!</span>
+xp = <span class="num" id="code-xp-val">500</span>
+rango = <span class="fn">calcular_rango</span>(xp)
+<span class="fn">print</span>(<span class="str">f"Con {xp} XP eres: {rango}"</span>)</code></pre>
+          </div>
+          <div class="code-run">
+            <span style="font-size:11px;color:var(--muted)">XP:</span>
+            <input type="range" id="code-xp-slider" min="0" max="2000" value="500" style="flex:1;accent-color:var(--oro);height:4px">
+            <span id="code-xp-display" style="font-size:12px;color:var(--oro);font-weight:700;min-width:40px">500</span>
+            <button class="code-run-btn" id="code-run-btn">▶ Ejecutar</button>
+          </div>
+          <div class="code-output" id="code-output">Con 500 XP eres: 🌙 Astrónomo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASTRONOMIA WEB -->
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <div class="project-info">
+          <div class="project-name">🌐 astronomia-web</div>
+          <div class="project-tech"><span>HTML</span><span>CSS</span><span>JS</span><span>GitHub Pages</span></div>
+        </div>
+      </div>
+      <div class="project-desc">
+        Versión web del proyecto astronomía. Publicada con GitHub Pages. 
+        Diseño responsivo con temática espacial.
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/sebastian-2308/astronomia-web" target="_blank">🔗 GitHub</a>
+        <a href="https://sebastian-2308.github.io/astronomia-web/" target="_blank">🌐 Live</a>
+      </div>
+    </div>
+
+    <!-- pagina-astronomia- -->
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <div class="project-info">
+          <div class="project-name">🪐 Página Astronomía</div>
+          <div class="project-tech"><span>HTML</span><span>CSS</span><span>GitHub Pages</span></div>
+        </div>
+      </div>
+      <div class="project-desc">
+        Página web informativa sobre astronomía con diseño atractivo y contenido educativo.
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/sebastian-2308/pagina-astronomia-" target="_blank">🔗 GitHub</a>
+        <a href="https://sebastian-2308.github.io/pagina-astronomia-" target="_blank">🌐 Live</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <h2 class="section-title">Servicios</h2>
+  <p class="section-sub">Lo que puedo hacer por tu proyecto o negocio</p>
+  <div class="services-grid">
+    <div class="service-card fade-in">
+      <span class="service-icon">🖥️</span>
+      <h3>Apps de Escritorio</h3>
+      <p>Creo aplicaciones de escritorio completas con Python + Flet. Interfaces modernas, bases de datos, autenticación, y empaquetado .exe.</p>
+      <span class="price">Desde $200 USD</span>
+    </div>
+    <div class="service-card fade-in">
+      <span class="service-icon">🤖</span>
+      <h3>Agentes con IA</h3>
+      <p>Asistentes inteligentes locales o en la nube. Automatización con LLMs, chatbots, agentes autónomos que ejecutan herramientas.</p>
+      <span class="price">Desde $300 USD</span>
+    </div>
+    <div class="service-card fade-in">
+      <span class="service-icon">⚡</span>
+      <h3>Automatización</h3>
+      <p>Scripts Python a medida: bots, web scraping, procesamiento de datos, automatización de tareas repetitivas, integraciones.</p>
+      <span class="price">Desde $80 USD</span>
+    </div>
+    <div class="service-card fade-in">
+      <span class="service-icon">🌐</span>
+      <h3>Páginas Web</h3>
+      <p>Landing pages, portafolios, sitios informativos. Diseño responsivo, moderno, optimizado. Con GitHub Pages incluido.</p>
+      <span class="price">Desde $100 USD</span>
+    </div>
+    <div class="service-card fade-in">
+      <span class="service-icon">📚</span>
+      <h3>Clases de Python</h3>
+      <p>Clases online personalizadas. Desde cero hasta proyectos reales. Aprende haciendo, con ejemplos de apps verdaderas.</p>
+      <span class="price">$25 USD/hora</span>
+    </div>
+    <div class="service-card fade-in">
+      <span class="service-icon">🔧</span>
+      <h3>Consultoría</h3>
+      <p>Revisión de código, arquitectura de software, recomendaciones técnicas. Ayuda con proyectos existentes.</p>
+      <span class="price">$40 USD/hora</span>
+    </div>
+  </div>
+</section>
+
+<!-- GITHUB -->
+<section id="github">
+  <h2 class="section-title">GitHub</h2>
+  <p class="section-sub">Mis repositorios públicos</p>
+  <div class="github-grid" id="github-repos">
+    <div style="text-align:center;padding:40px;color:var(--muted)">Cargando repositorios...</div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <h2 class="section-title">Trabajemos juntos</h2>
+  <p class="section-sub">Cuéntame tu idea y la hacemos realidad</p>
+  <div class="contact-content">
+    <form class="contact-form fade-in" id="contact-form">
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="form-name" placeholder="Tu nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="form-email" placeholder="tu@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>¿Qué necesitas?</label>
+        <select id="form-service">
+          <option value="">Selecciona un servicio</option>
+          <option>App de escritorio</option>
+          <option>Asistente con IA</option>
+          <option>Automatización</option>
+          <option>Página web</option>
+          <option>Clases de Python</option>
+          <option>Consultoría</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Cuéntame tu idea</label>
+        <textarea id="form-message" placeholder="Describe tu proyecto o lo que necesitas..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Presupuesto estimado</label>
+        <input type="text" id="form-budget" placeholder="$ USD (opcional)">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;font-size:16px">
+        📩 Enviar mensaje
+      </button>
+      <div id="form-status" style="text-align:center;margin-top:10px;font-size:13px"></div>
+    </form>
+    <div class="contact-extra">
+      <a href="mailto:sebastianalfonzo23@gmail.com">📧 sebastianalfonzo23@gmail.com</a>
+      <a href="https://github.com/sebastian-2308" target="_blank">🐙 GitHub</a>
+      <a href="https://wa.me/584141234567" target="_blank">💬 WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="social">
+    <a href="https://github.com/sebastian-2308" target="_blank" title="GitHub">🐙</a>
+    <a href="mailto:sebastianalfonzo23@gmail.com" title="Email">📧</a>
+    <a href="#" title="YouTube">▶️</a>
+  </div>
+  <p>© 2026 NEXUS DEV — Sebastián Alfonzo. Todos los derechos reservados.</p>
+  <p style="margin-top:4px;font-size:10px">Hecho con Python, pasión y ☕ desde Venezuela 🇻🇪</p>
+</footer>
+
+<script>
+// === STARS ===
+(function(){
+  const container = document.getElementById('stars');
+  for(let i=0;i<200;i++){
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random()*2.5+1;
+    star.style.width = size+'px'; star.style.height = size+'px';
+    star.style.left = Math.random()*100+'%';
+    star.style.top = Math.random()*100+'%';
+    star.style.setProperty('--dur', (Math.random()*3+2)+'s');
+    star.style.animationDelay = Math.random()*5+'s';
+    container.appendChild(star);
+  }
+  // shooting stars
+  const ss = document.getElementById('shooting-stars');
+  function createShootingStar(){
+    const s = document.createElement('div');
+    s.className = 'shooting-star';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*50+'%';
+    s.style.animationDuration = (Math.random()*1.5+1)+'s';
+    s.style.animationDelay = '0s';
+    ss.appendChild(s);
+    setTimeout(()=>s.remove(),3000);
+  }
+  setInterval(createShootingStar, 4000+Math.random()*3000);
+})();
+
+// === SCROLL ANIMATIONS ===
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible')}});
+}, {threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+// === QUIZ (Astrobook demo) ===
+const questions = [
+  {q:"¿Cuántos planetas tiene el Sistema Solar?",opts:["7","8","9","10"],ans:1},
+  {q:"¿Cuál es el planeta más grande?",opts:["Saturno","Júpiter","Neptuno","Urano"],ans:1},
+  {q:"¿Qué estrella está más cerca de la Tierra?",opts:["Alfa Centauri","Sirius","El Sol","Próxima Centauri"],ans:2},
+  {q:"¿Cada cuánto la Luna se aleja de la Tierra?",opts:["1.2 cm/año","3.8 cm/año","5.5 cm/año","10 cm/año"],ans:1},
+  {q:"¿Cuánto tarda la luz del Sol en llegar a la Tierra?",opts:["2 minutos","5 minutos","8 minutos","12 minutos"],ans:2},
+];
+let qIdx=0,qScore=0;
+function loadQuiz(){
+  const q=questions[qIdx];
+  document.getElementById('quiz-q').textContent=q.q;
+  const opts=document.getElementById('quiz-opts'); opts.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-opt'; btn.textContent=o;
+    btn.onclick=()=>checkQuiz(i,btn);
+    opts.appendChild(btn);
+  });
+  document.getElementById('quiz-result').style.display='none';
+  document.getElementById('quiz-next').style.display='none';
+}
+function checkQuiz(idx,btn){
+  const q=questions[qIdx];
+  const all=document.querySelectorAll('.quiz-opt');
+  all.forEach(b=>b.onclick=null);
+  const res=document.getElementById('quiz-result');
+  res.style.display='block';
+  if(idx===q.ans){
+    qScore++;
+    res.className='quiz-result correct';
+    res.textContent='✅ ¡Correcto!';
+    btn.classList.add('correct');
+  }else{
+    res.className='quiz-result wrong';
+    res.textContent='❌ Incorrecto. La respuesta era: '+q.opts[q.ans];
+    btn.classList.add('wrong');
+    all[q.ans].classList.add('correct');
+  }
+  btn.classList.add('selected');
+  const next=document.getElementById('quiz-next');
+  next.style.display='block';
+  next.textContent=qIdx<questions.length-1?'Siguiente pregunta →':'Ver resultado final';
+}
+document.getElementById('quiz-next').onclick=()=>{
+  qIdx++;
+  if(qIdx<questions.length)loadQuiz();
+  else{
+    const res=document.getElementById('quiz-result');
+    res.style.display='block';
+    res.className='quiz-result correct';
+    res.textContent='🏆 Quiz completo! Acertaste '+qScore+' de '+questions.length;
+    document.getElementById('quiz-opts').innerHTML='';
+    document.getElementById('quiz-q').textContent='¿Quieres intentarlo de nuevo?';
+    document.getElementById('quiz-next').textContent='🔄 Reintentar';
+    document.getElementById('quiz-next').onclick=()=>{qIdx=0;qScore=0;loadQuiz()};
+  }
+};
+loadQuiz();
+
+// === TERMINAL (Nexus demo) ===
+const termBody=document.getElementById('terminal-body');
+const termInput=document.getElementById('terminal-input');
+const nexusCommands={
+  help:'Comandos disponibles: help, version, analyze, read, write, search, list, clear, about\nUsa "analyze &lt;archivo&gt;" para analizar código con AST.',
+  version:'nexus v2.0.0 (build 2026)\nProvider: ollama | Model: qwen2.5-coder:7b\nWorkDir: /proyecto\nTools: 15 registradas',
+  clear:null,
+  about:'Nexus — Asistente de programación con IA\nCreado por Sebastián Alfonzo\n100% local, tool-use, multi-provider\nhttps://github.com/sebastian-2308',
+};
+function termExec(cmd){
+  const line=document.createElement('div');
+  line.innerHTML='<span class="prompt">➜</span> <span class="cmd">'+cmd+'</span>';
+  termBody.appendChild(line);
+  const out=document.createElement('div');
+  out.className='output';
+  const c=cmd.trim().toLowerCase();
+  if(c===''||c==='clear'){termBody.innerHTML='';return}
+  if(nexusCommands[c]!==undefined){
+    if(nexusCommands[c]===null){termBody.innerHTML='';return}
+    out.textContent=nexusCommands[c];
+  }else if(c.startsWith('analyze ')){
+    const file=c.slice(8);
+    out.className='output info';
+    out.textContent='[analyze] Archivo: '+file+'\n  → Funciones: 12\n  → Clases: 3\n  → Imports: 8\n  → Líneas: 245\n✅ Análisis completado.';
+  }else if(c.startsWith('read ')){
+    const file=c.slice(5);
+    out.textContent='[read] leyendo '+file+'...\n(mostrando primeras 30 líneas)';
+  }else if(c.startsWith('search ')){
+    const q=c.slice(7);
+    out.className='output info';
+    out.textContent='[search] "'+q+'" → 5 resultados:\n  • main.py:23  def calcular_rango\n  • app.py:156  def verificar_rango\n  • data.py:88  def cargar_progreso\n  • agent.py:45  def run_agent\n  • cli.py:12  def main';
+  }else if(c==='list'){
+    out.className='output info';
+    out.textContent='[list_projects] Proyectos detectados:\n  📁 appastronomia/  (Python/Flet)\n  📁 nexus/  (Python/CLI)\n  📁 codigos/  (Python/Lessons)';
+  }else{
+    out.textContent='nexus: comando no encontrado. Escribe "help" para ver los comandos disponibles.';
+  }
+  termBody.appendChild(out);
+  termBody.scrollTop=termBody.scrollHeight;
+}
+termInput.addEventListener('keydown',(e)=>{
+  if(e.key==='Enter'){
+    const cmd=termInput.value; termInput.value='';
+    termExec(cmd);
+  }
+});
+
+// === CODE LESSON ===
+const xpSlider=document.getElementById('code-xp-slider');
+const xpDisplay=document.getElementById('code-xp-display');
+const xpVal=document.getElementById('code-xp-val');
+const output=document.getElementById('code-output');
+function calcRango(xp){
+  if(xp<=199)return '🌑 Novato';
+  if(xp<=499)return '🌙 Astrónomo';
+  if(xp<=999)return '🚀 Explorador';
+  return '👑 Leyenda Cósmica';
+}
+function updateCode(){
+  const xp=parseInt(xpSlider.value);
+  xpDisplay.textContent=xp;
+  xpVal.textContent=xp;
+}
+xpSlider.addEventListener('input',updateCode);
+document.getElementById('code-run-btn').addEventListener('click',()=>{
+  const xp=parseInt(xpSlider.value);
+  output.textContent='Con '+xp+' XP eres: '+calcRango(xp);
+});
+updateCode();
+
+// === GITHUB REPOS ===
+(async function(){
+  try{
+    const r=await fetch('https://api.github.com/users/sebastian-2308/repos?per_page=50&sort=updated&direction=desc');
+    const repos=await r.json();
+    const grid=document.getElementById('github-repos');
+    grid.innerHTML='';
+    const langs={};
+    repos.forEach(repo=>{
+      if(repo.language)langs[repo.language]=(langs[repo.language]||0)+1;
+    });
+    const langColors={
+      Python:'var(--accent)',JavaScript:'var(--oro)',HTML:'var(--racha)','CSS':'var(--cyan)','TypeScript':'var(--exito)'
+    };
+    repos.slice(0,12).forEach(repo=>{
+      const card=document.createElement('div');
+      card.className='github-card';
+      const desc=repo.description||'Sin descripción';
+      card.innerHTML=`
+        <h4>📁 ${repo.name}</h4>
+        <p>${desc.slice(0,80)}${desc.length>80?'...':''}</p>
+        <div class="meta">
+          <span style="color:${langColors[repo.language]||'var(--muted)'}">⬤ ${repo.language||'N/A'}</span>
+          <span>⭐ ${repo.stargazers_count}</span>
+          <span>⑂ ${repo.forks_count}</span>
+        </div>
+      `;
+      card.onclick=()=>window.open(repo.html_url,'_blank');
+      card.style.cursor='pointer';
+      grid.appendChild(card);
+    });
+  }catch(e){
+    document.getElementById('github-repos').innerHTML=`
+      <div style="text-align:center;padding:20px;color:var(--muted)">
+        No se pudieron cargar los repositorios.<br>
+        <a href="https://github.com/sebastian-2308" target="_blank" style="color:var(--oro)">
+          Ver perfil de GitHub →
+        </a>
+      </div>
+    `;
+  }
+})();
+
+// === CONTACT FORM ===
+document.getElementById('contact-form').addEventListener('submit',function(e){
+  e.preventDefault();
+  const name=document.getElementById('form-name').value.trim();
+  const email=document.getElementById('form-email').value.trim();
+  const service=document.getElementById('form-service').value;
+  const msg=document.getElementById('form-message').value.trim();
+  const budget=document.getElementById('form-budget').value.trim();
+  const status=document.getElementById('form-status');
+  if(!name||!email||!msg){
+    status.textContent='⚠️ Por favor completa todos los campos obligatorios.';
+    status.style.color='var(--error)';
+    return;
+  }
+  const body=`Nuevo contacto desde NEXUS.dev\n\nNombre: ${name}\nEmail: ${email}\nServicio: ${service||'No especificado'}\nPresupuesto: ${budget||'No especificado'}\n\nMensaje:\n${msg}`;
+  window.location.href=`mailto:sebastianalfonzo23@gmail.com?subject=Contacto%20NEXUS%20-%20${encodeURIComponent(name)}&body=${encodeURIComponent(body)}`;
+  status.textContent='✅ Mensaje preparado. Abriendo tu cliente de correo...';
+  status.style.color='var(--exito)';
+  this.reset();
+});
+</script>
+</body>
+</html>
